@@ -3,6 +3,7 @@ import traceback
 import re
 import itertools
 import random
+import logging
 
 from dotenv import load_dotenv
 from gremlin_python.driver import client, serializer
@@ -31,6 +32,8 @@ azureopenai_deployment = os.getenv('AZUREOPENAI_DEPLOYMENT')
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+app.logger.setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 def send_gremlin_query(client, query):
     try:
@@ -46,8 +49,10 @@ def send_gremlin_query(client, query):
 
 @app.route('/form', methods=['GET'])
 def get_by_form():
+    logging.debug('Ingresa form endpoint')
     job_title = request.args.get('job_title')
     job_title = job_title.replace("'", "")
+    logging.debug(f'Ingresa form endpoint {job_title}')
     return jsonify({'table': get_table(job_title), 'graph': get_graph(job_title)})
 
 @app.route('/file', methods=['POST'])
@@ -104,6 +109,7 @@ def list_job_titles():
     return ({'data': job_titles})
 
 def get_graph(job_title):
+    logging.debug(f'Ingresa get_graph')
     vertices = []
     nodes = []
     links = []
@@ -129,12 +135,14 @@ def get_graph(job_title):
         links.append({'source': i[1][1], 'target': i[1][0]})
     
     client.close()
+    logging.debug(f'Ingresa nodes and links {nodes} ---------- {links}')
     return ({'nodes': nodes, 'links': links})
 
 def select_image(quantity):
     return random.sample(range(100), quantity)
 
 def get_table(job_title):
+    logging.debug(f'Ingresa get_table')
     data = []
     client = create_client_search()
     results = client.search(search_text=job_title)
@@ -143,9 +151,11 @@ def get_table(job_title):
         related = [0 if job_title == result['job_title'] else 1]
         data.append({'fullname': result['fullname'],'job_title': result['job_title'],'country': result['country'],'skills': result['skills'],'university': result['university'],'company': result['company'],'related ': related[0],'url': 'https://www.linkedin.com/company/microsoft/',})
     client.close()
+    logging.debug(f'Ingresa get_graph data {data}')
     return ({'data': data})
 
 def create_client_cosmos():
+    logging.debug(f'Ingresa client cosmos')
     return client.Client(
         url=f"wss://{gremlin_service}.gremlin.cosmos.azure.com:443/",
         traversal_source="g",
@@ -155,21 +165,25 @@ def create_client_cosmos():
     )
 
 def create_client_search():
+    logging.debug(f'Ingresa client search')
     service_endpoint = f'https://{search_service}.search.windows.net'
     index_name = search_index
     key = search_password
     return SearchClient(service_endpoint, index_name, AzureKeyCredential(key))
 
 def create_client_document():
+    logging.debug(f'Ingresa client document')
     endpoint = f"https://{document_service}.cognitiveservices.azure.com/"
     key = document_password
     return DocumentAnalysisClient(endpoint=endpoint, credential=AzureKeyCredential(key))
 
 def create_client_openai():
+    logging.debug(f'Ingresa client openai')
     base_url = f"https://{azureopenai_service}.openai.azure.com/"
     api_version = azureopenai_api_version
     api_key = azureopenai_password
     return AzureOpenAI(api_key=api_key, api_version=api_version, azure_endpoint=base_url)
 
 if __name__ == '__main__':
+    logging.debug(f'Ingresa __name__')
     app.run(debug=True)
