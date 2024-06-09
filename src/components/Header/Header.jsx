@@ -5,6 +5,7 @@ import SendIcon from "@mui/icons-material/Send";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { TextField, Grid, Box, Autocomplete } from "@mui/material";
 import { enviarRol, uploadFile } from "../../api/apiService.js";
+import ClearIcon from "@mui/icons-material/Clear";
 import "./Header.css";
 
 const jobOptions = [
@@ -59,6 +60,7 @@ const jobOptions = [
 function Header({ onLoadingChange }) {
   const [typing, setTyping] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [showClearButton, setShowClearButton] = useState(false);
   const { setJobData, setJobDataTable } = useContext(JobDataContext);
 
   const inputRef = useRef(null);
@@ -87,19 +89,18 @@ function Header({ onLoadingChange }) {
 
       setJobDataTable(data?.table);
       setJobData(data?.graph);
-      console.log(data);
+      setShowClearButton(true);
+      
       onLoadingChange(false);
     };
     reader.readAsArrayBuffer(file);
   };
 
-
   const handleSelectChange = (event, newValue) => {
     setSelectedJob(newValue);
 
     if (newValue === null) {
-      setJobDataTable(null);
-      setJobData(null);
+      clearData();
     }
   };
 
@@ -110,10 +111,18 @@ function Header({ onLoadingChange }) {
 
       setJobDataTable(dataGraphic?.table);
       setJobData(dataGraphic?.graph);
+      setShowClearButton(true);
       onLoadingChange(false);
       inputRef.current.focus();
       setTyping(false);
     }
+  };
+
+  const clearData = () => {
+    setJobDataTable(null);
+    setJobData(null);
+    setShowClearButton(false);
+    setSelectedJob(null);
   };
 
   return (
@@ -134,9 +143,14 @@ function Header({ onLoadingChange }) {
             ref={inputContainerRef}
             sx={{ display: "flex", alignItems: "center" }}
           >
-            <RoundedBtn icon={<AttachFileIcon />} onClick={handleImgUpload} />
+            <RoundedBtn
+              disable={showClearButton}
+              icon={<AttachFileIcon />}
+              onClick={handleImgUpload}
+            />
             <input
               type="file"
+              disabled={showClearButton}
               accept="application/pdf"
               ref={fileInputRef}
               style={{ display: "none" }}
@@ -161,6 +175,12 @@ function Header({ onLoadingChange }) {
               icon={<SendIcon />}
               onClick={handleSelectSubmit}
             />
+            {showClearButton && (
+              <RoundedBtn
+                icon={<ClearIcon />} // Asegúrate de importar y usar el icono correcto para limpiar
+                onClick={clearData}
+              />
+            )}
           </Box>
         </Grid>
       </div>

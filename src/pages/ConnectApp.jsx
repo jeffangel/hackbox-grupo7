@@ -21,11 +21,9 @@ function ConnectApp() {
   const { jobData, jobDataTable } = useContext(JobDataContext);
 
   useEffect(() => {
-    console.log("Job Data:", jobData);
   }, [jobData, jobDataTable]);
 
   const handleLoading = (isLoading) => {
-    console.log("Loading state changed:", isLoading);
     setLoading(isLoading);
   };
 
