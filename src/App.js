@@ -3,6 +3,7 @@ import { JobDataProvider } from "./contexts/JobDataContext.js";
 import ConnectApp from "./pages/ConnectApp.jsx";
 
 function App() {
+  
   return (
     <JobDataProvider>
       <ConnectApp />
