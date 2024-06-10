@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.2a2eeae5.css",
+    "main.js": "/static/js/main.de05adcb.js",
+    "static/media/pexels-divinetechygirl-1181355.jpg": "/static/media/pexels-divinetechygirl-1181355.5f8478b12222d515c09c.jpg",
+    "index.html": "/index.html",
+    "main.2a2eeae5.css.map": "/static/css/main.2a2eeae5.css.map",
+    "main.de05adcb.js.map": "/static/js/main.de05adcb.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2a2eeae5.css",
+    "static/js/main.de05adcb.js"
+  ]
+}
